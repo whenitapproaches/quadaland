@@ -1,22 +1,20 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
   BeforeInsert,
   BeforeUpdate,
-  CreateDateColumn,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 
 import * as bcrypt from 'bcrypt';
+import { RoleEntity } from 'src/roles/entities/role.entity';
+import { BaseEntity } from 'src/_common/entities/base-entity';
 
 @Entity('user')
-export class UserEntity {
-  @PrimaryGeneratedColumn()
-  @Exclude()
-  id: number;
-
+export class UserEntity extends BaseEntity {
   @Column({
     length: 20,
     unique: true,
@@ -30,10 +28,13 @@ export class UserEntity {
   @Column({ default: false })
   is_active: boolean;
 
-  @CreateDateColumn()
-  created_at: string;
+  @ManyToOne(() => RoleEntity)
+  @JoinColumn({ name: 'role_id' })
+  @Transform(({ value }) => value.name)
+  role: RoleEntity;
 
   constructor(data: Partial<UserEntity> = {}) {
+    super();
     Object.assign(this, data);
   }
 

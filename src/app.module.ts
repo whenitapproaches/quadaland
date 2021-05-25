@@ -15,7 +15,21 @@ import { MorganInterceptor, MorganModule } from 'nest-morgan';
 import { AppThrottlerGuard } from './_common/guards/throttler.guard';
 import { RolesModule } from './roles/roles.module';
 import { AuthModule } from './auth/auth.module';
+import { CustomersModule } from './customers/customers.module';
+import { CompaniesModule } from './companies/companies.module';
+import { PropertiesModule } from './properties/properties.module';
+import { MediaModule } from './media/media.module';
 import jwtConfig from './_config/jwt.config';
+import morganConfig from './_config/morgan.config';
+import { PropertySaleMethodsModule } from './property-sale-methods/property-sale-methods.module';
+import { PropertyDetailsModule } from './property-details/property-details.module';
+import { GeolocationModule } from './geolocation/geolocation.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { StoragesModule } from './storages/storages.module';
+import { PusherModule } from './pusher/pusher.module';
+import pusherConfig from './_config/pusher.config';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,6 +39,7 @@ import jwtConfig from './_config/jwt.config';
         rateLimitingConfig,
         jwtConfig,
         swaggerConfig,
+        pusherConfig,
         appConfig,
       ],
       isGlobal: true,
@@ -43,10 +58,24 @@ import jwtConfig from './_config/jwt.config';
         limit: config.get('rate-limiting.limit'),
       }),
     }),
+    EventEmitterModule.forRoot({
+      delimiter: '.',
+    }),
     MorganModule,
+    RolesModule,
     UsersModule,
     RolesModule,
     AuthModule,
+    CustomersModule,
+    CompaniesModule,
+    PropertiesModule,
+    MediaModule,
+    PropertySaleMethodsModule,
+    PropertyDetailsModule,
+    GeolocationModule,
+    NotificationsModule,
+    StoragesModule,
+    PusherModule,
   ],
   controllers: [AppController],
   providers: [
@@ -58,7 +87,7 @@ import jwtConfig from './_config/jwt.config';
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: MorganInterceptor('tiny'),
+      useClass: MorganInterceptor(morganConfig),
     },
   ],
 })

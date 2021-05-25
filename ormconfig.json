@@ -6,6 +6,11 @@
   "password": "",
   "database": "quadaland",
   "entities": ["dist/**/*.entity{.ts,.js}"],
-  "migrations": ["dist/**/*.migration{.ts,.js}"],
-  "synchronize": true
+  "migrations": ["dist/migration/*{.ts,.js}"],
+  "seeds": ["dist/**/*.seed{.ts,.js}"],
+  "migrationsTableName": "migrations",
+  "synchronize": true,
+  "cli": {
+    "migrationsDir": "dist/migration"
+  }
 }

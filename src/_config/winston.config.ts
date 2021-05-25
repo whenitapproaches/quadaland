@@ -42,6 +42,9 @@ export default registerAs(
         format: format.combine(fileLogFormat, format.ms()),
         level: 'error',
       }),
+      new transports.Http({
+        format: format.combine(format.colorize(), consoleLogFormat),
+      }),
     ],
     exitOnError: false,
   }),
