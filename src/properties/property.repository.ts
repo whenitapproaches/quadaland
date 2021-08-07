@@ -62,9 +62,7 @@ export class PropertyRepository extends Repository<PropertyEntity> {
 
     if (queryEntity.search) {
       const searchQuery = `%${queryEntity.search.toLowerCase()}%`;
-      query.andWhere('details.address LIKE :search', {
-        search: searchQuery,
-      });
+
       query.andWhere(
         new Brackets((qb) => {
           qb.where('details.address LIKE :search', {

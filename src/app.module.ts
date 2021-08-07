@@ -75,6 +75,7 @@ import pusherConfig from './_config/pusher.config';
     GeolocationModule,
     NotificationsModule,
     StoragesModule,
+    PusherModule,
   ],
   controllers: [AppController],
   providers: [

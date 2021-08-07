@@ -93,8 +93,20 @@ export class PropertiesService {
     return property;
   }
 
-  private emitPropertyCreatedEvent(payload: PropertyCreatedEvent) {
-    return this.eventEmitter.emit('property.created', payload);
+  private emitPropertyCreatedEvent(property: PropertyEntity) {
+    const propertyCreatedEvent = new PropertyCreatedEvent();
+
+    propertyCreatedEvent.notification.type =
+      NotificationTypeEnum.CompanyPostingProperty;
+
+    propertyCreatedEvent.notification.object = property.company.full_name;
+
+    propertyCreatedEvent.notification.target = {
+      id: property.slug,
+      type: TargetTypes.Property,
+    };
+
+    return this.eventEmitter.emit('property.created', propertyCreatedEvent);
   }
 
   async createByAdmin(createPropertyDto: CreatePropertyDto) {
@@ -103,10 +115,6 @@ export class PropertiesService {
     property.approval_status = true;
 
     const savedProperty = await this.propertyRepository.save(property);
-
-    const propertyCreatedEvent = new PropertyCreatedEvent();
-
-    await this.emitPropertyCreatedEvent(propertyCreatedEvent);
 
     return savedProperty;
   }
@@ -126,17 +134,7 @@ export class PropertiesService {
 
     const savedProperty = await this.propertyRepository.save(property);
 
-    // const propertyCreatedEvent = new PropertyCreatedEvent();
-
-    // propertyCreatedEvent.notification.type =
-    //   NotificationTypeEnum.AdminPostingProperty;
-
-    // propertyCreatedEvent.notification.object = savedProperty.company.full_name;
-
-    // propertyCreatedEvent.notification.target.id = savedProperty.slug;
-    // propertyCreatedEvent.notification.target.type = TargetTypes.Property;
-
-    // await this.emitPropertyCreatedEvent(propertyCreatedEvent);
+    await this.emitPropertyCreatedEvent(savedProperty);
 
     return savedProperty;
   }

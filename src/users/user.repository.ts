@@ -31,7 +31,7 @@ export class UserRepository extends Repository<UserEntity> {
         is_active: queryEntity.is_active,
       });
 
-    query.addOrderBy('user.created_at', 'DESC');
+    query.addOrderBy('user.created_at', 'ASC');
 
     query
       .take(queryEntity.per_page)
