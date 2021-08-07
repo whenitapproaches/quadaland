@@ -10,6 +10,7 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: process.env.NODE_ENV === 'development',
+    cors: true,
   });
   const configService = app.get<ConfigService>(ConfigService);
 
@@ -29,11 +30,9 @@ async function bootstrap() {
 
   swagger(app, configService.get('swagger'));
 
-  app.use(helmet());
+  app.enableCors();
 
-  app.enableCors({
-    origin: '*',
-  });
+  app.use(helmet());
 
   await app.listen(configService.get('app.port'));
 }
