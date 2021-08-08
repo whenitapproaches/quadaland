@@ -3,18 +3,17 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { classToPlain } from 'class-transformer';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { PusherService } from 'src/pusher/pusher.service';
-import { PropertyApprovedEvent } from '../events/property-approved';
-import { PropertyCreatedEvent } from '../events/property-created.event';
+import { UserSignedUpEvent } from '../events/user-signed-up.event';
 
 @Injectable()
-export class PropertyListener {
+export class AuthListener {
   constructor(
     private readonly pusherService: PusherService,
     private readonly notificationService: NotificationsService,
   ) {}
 
-  @OnEvent('property.created')
-  async handlePropertyCreatedEvent(event: PropertyCreatedEvent) {
+  @OnEvent('user.signed-up')
+  async handleUserSignedUpEvent(event: UserSignedUpEvent) {
     const createdNotification = classToPlain(event).notification;
 
     const notification = await this.notificationService.create(
@@ -24,22 +23,7 @@ export class PropertyListener {
     return this.pusherService.broadcast(
       notification,
       event.channelName,
-      'property-created',
-    );
-  }
-
-  @OnEvent('property.approved')
-  async handlePropertyApprovedEvent(event: PropertyApprovedEvent) {
-    const createdNotification = classToPlain(event).notification;
-
-    const notification = await this.notificationService.create(
-      createdNotification,
-    );
-
-    return this.pusherService.broadcast(
-      notification,
-      event.channelName,
-      'property-approved',
+      'user-signed-up',
     );
   }
 }

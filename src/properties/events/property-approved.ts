@@ -1,6 +1,6 @@
 import { createNotificationDto } from 'src/notifications/dto/create-notification-dto';
 
-export class PropertyCreatedEvent {
+export class PropertyApprovedEvent {
   notification: createNotificationDto;
   channelName: string;
   constructor() {

@@ -8,5 +8,5 @@ const { JWT_SECRET } = process.env;
 
 export default registerAs('jwt', () => ({
   secret: JWT_SECRET,
-  expiresIn: '30m',
+  expiresIn: '4h',
 }));

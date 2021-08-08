@@ -4,7 +4,7 @@
   "port": 3306,
   "username": "root",
   "password": "",
-  "database": "quadaland",
+  "database": "quadaland-develop",
   "entities": ["dist/**/*.entity{.ts,.js}"],
   "migrations": ["dist/migration/*{.ts,.js}"],
   "seeds": ["dist/**/*.seed{.ts,.js}"],

@@ -10,6 +10,11 @@ import { JwtManager } from './jwt.manager';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { RoleEnum } from 'src/roles/role.enum';
 import { CustomersService } from 'src/customers/customers.service';
+import { TargetTypes } from 'src/notifications/interfaces/notification-target.interface';
+import { NotificationVisibilityEnum } from 'src/notifications/notification-visibility.enum';
+import { NotificationTypeEnum } from 'src/notifications/notification-type.enum';
+import { UserSignedUpEvent } from './events/user-signed-up.event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +24,7 @@ export class AuthService {
     private readonly customersService: CustomersService,
     @Inject(jwtConfig.KEY)
     private config: ConfigType<typeof jwtConfig>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async signIn(credential: SignInDto) {
@@ -62,12 +68,36 @@ export class AuthService {
       console.log(err);
     }
 
+    console.log(createdUser);
+
+    await this.notifyUserSignUpToModerators(createdUser);
+
     return {
       success: true,
       data: {
         username: payload.username,
       },
     };
+  }
+
+  private async notifyUserSignUpToModerators(user) {
+    const userSignedUpEvent = new UserSignedUpEvent();
+
+    userSignedUpEvent.notification.type = NotificationTypeEnum.NewSignedUpUser;
+
+    userSignedUpEvent.notification.visibility =
+      NotificationVisibilityEnum.Admin;
+
+    userSignedUpEvent.notification.subject = user.username;
+
+    userSignedUpEvent.notification.target = {
+      id: user.username,
+      type: TargetTypes.User,
+    };
+
+    userSignedUpEvent.channelName = 'private-moderators';
+
+    await this.eventEmitter.emit('user.signed-up', userSignedUpEvent);
   }
 
   async signOut(authorizationHeader: string) {

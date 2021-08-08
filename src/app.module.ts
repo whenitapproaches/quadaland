@@ -29,6 +29,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { StoragesModule } from './storages/storages.module';
 import { PusherModule } from './pusher/pusher.module';
 import pusherConfig from './_config/pusher.config';
+import { NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({
   imports: [

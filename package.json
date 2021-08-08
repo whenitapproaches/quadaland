@@ -54,6 +54,7 @@
     "nanoid": "^3.1.23",
     "nest-morgan": "^2.0.0",
     "nest-winston": "^1.4.2",
+    "nestjs-form-data": "^1.4.7",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pusher": "^5.0.0",

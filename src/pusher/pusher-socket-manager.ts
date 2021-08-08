@@ -4,7 +4,7 @@ import { PusherSocket } from './pusher-socket.interface';
 
 @Injectable()
 export class PusherSocketManager {
-  #pusherSocketOwners: Array<PusherSocket>;
+  #pusherSocketOwners: Array<PusherSocket> = [];
 
   constructor() {}
 

@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import * as Pusher from 'pusher';
+import { NotificationEntity } from 'src/notifications/entities/notification.entity';
 import pusherConfig from 'src/_config/pusher.config';
 import { PusherSocketManager } from './pusher-socket-manager';
 
 @Injectable()
 export class PusherService {
-  #pusher;
+  #pusher: Pusher;
 
   constructor(
     @Inject(pusherConfig.KEY)
@@ -34,5 +35,16 @@ export class PusherService {
     return auth;
   }
 
-  broadcastTo(event) {}
+  broadcast(
+    notification: NotificationEntity,
+    channelName: string,
+    eventName: string,
+  ) {
+    console.log(notification, channelName, eventName);
+    this.#pusher
+      .trigger(channelName, eventName, notification)
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 }

@@ -7,6 +7,9 @@ import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomersModule } from 'src/customers/customers.module';
+import { PusherModule } from 'src/pusher/pusher.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
+import { AuthListener } from './listeners/auth.listener';
 
 @Module({
   imports: [
@@ -21,8 +24,10 @@ import { CustomersModule } from 'src/customers/customers.module';
         signOptions: { expiresIn: config.get('jwt.expiresIn') },
       }),
     }),
+    PusherModule,
+    NotificationsModule,
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, AuthListener],
   controllers: [AuthController],
 })
 export class AuthModule {}
