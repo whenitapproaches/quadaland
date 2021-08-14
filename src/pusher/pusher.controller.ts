@@ -43,8 +43,6 @@ export class PusherController {
     if (channelName.includes('private-user-')) {
       const username = channelName.replace('private-user-', '');
 
-      console.log(username);
-
       await this.usersService.findOneOrFail(username);
 
       if (currentUsername !== username)

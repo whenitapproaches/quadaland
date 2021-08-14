@@ -24,7 +24,7 @@ export function IsCoordinateString(validationOptions?: ValidationOptions) {
 @ValidatorConstraint({ name: 'IsCoordinateString' })
 export class IsCoordinateStringConstraint
   implements ValidatorConstraintInterface {
-  validate(value: any, args: ValidationArguments) {
+  validate(value: string, args: ValidationArguments) {
     return (
       matches(value, /[0-9.]+,[0-9.]+/g) &&
       isLatitude(value.split(',')[0]) &&

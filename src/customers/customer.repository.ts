@@ -14,6 +14,15 @@ export class CustomerRepository extends Repository<CustomerEntity> {
 
     if (withDeleted) query.withDeleted();
 
+    if (queryEntity.sort_by) {
+      queryEntity.sort_by.forEach((sortField) => {
+        const order = sortField.includes('-') ? 'DESC' : 'ASC';
+        const field = sortField.replace(/[+-]/, '');
+        const relationField = `customer.${field}`;
+        query.addOrderBy(relationField, order);
+      });
+    }
+
     query.leftJoinAndSelect('customer.user', 'user');
 
     query

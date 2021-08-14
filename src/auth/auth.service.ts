@@ -68,8 +68,6 @@ export class AuthService {
       console.log(err);
     }
 
-    console.log(createdUser);
-
     await this.notifyUserSignUpToModerators(createdUser);
 
     return {
