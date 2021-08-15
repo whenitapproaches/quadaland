@@ -10,6 +10,7 @@ import { CustomersModule } from 'src/customers/customers.module';
 import { PusherModule } from 'src/pusher/pusher.module';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { AuthListener } from './listeners/auth.listener';
+import { MailsModule } from 'src/mails/mails.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuthListener } from './listeners/auth.listener';
     }),
     PusherModule,
     NotificationsModule,
+    MailsModule,
   ],
   providers: [AuthService, JwtStrategy, AuthListener],
   controllers: [AuthController],

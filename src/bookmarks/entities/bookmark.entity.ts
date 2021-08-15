@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -15,12 +15,12 @@ export class BookmarkEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'user_id' })
   @Transform(({ value }) => value?.username)
   user: UserEntity;
 
-  @OneToOne(() => PropertyEntity)
+  @ManyToOne(() => PropertyEntity)
   @JoinColumn({ name: 'property_id' })
   property: Partial<PropertyEntity>;
 

@@ -1,4 +1,10 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { SignInDto } from './dto/sign-in.dto';
 import jwtConfig from 'src/_config/jwt.config';
@@ -15,15 +21,23 @@ import { NotificationVisibilityEnum } from 'src/notifications/notification-visib
 import { NotificationTypeEnum } from 'src/notifications/notification-type.enum';
 import { UserSignedUpEvent } from './events/user-signed-up.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MailsService } from 'src/mails/mails.service';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { decodeBase64, encodeBase64 } from 'src/_common/utils/base64.util';
+import { URL } from 'url';
+import appConfig from 'src/_config/app.config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly mailsService: MailsService,
     private readonly customersService: CustomersService,
     @Inject(jwtConfig.KEY)
     private config: ConfigType<typeof jwtConfig>,
+    @Inject(appConfig.KEY)
+    private applicationConfig: ConfigType<typeof appConfig>,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -42,6 +56,16 @@ export class AuthService {
     throw new UnauthorizedException();
   }
 
+  private generateActivationToken(username: UserEntity['username']) {
+    const payload = { username };
+    const jwtToken = this.jwtService.sign(payload, {
+      expiresIn: this.applicationConfig.activation.expiresIn,
+      secret: this.applicationConfig.keys.auth,
+    });
+    const activation_token = encodeBase64(jwtToken);
+    return activation_token;
+  }
+
   async signUp(payload: SignUpDto) {
     const existedUser = await this.usersService.existByUsername(
       payload.username,
@@ -49,26 +73,40 @@ export class AuthService {
 
     if (existedUser) throw new DuplicatedException();
 
-    const createUserDto: CreateUserDto = {
+    const activationToken = this.generateActivationToken(payload.username);
+
+    const createUserDto = {
       ...payload,
       role: RoleEnum.Customer,
+      activation_token: activationToken,
     };
 
     const createdUser = await this.usersService.create(createUserDto);
 
-    try {
-      await this.customersService.create({
-        address: null,
-        phone: null,
-        email: null,
-        full_name: null,
-        user: createdUser,
-      });
-    } catch (err) {
-      console.log(err);
-    }
+    await this.customersService.create({
+      address: null,
+      phone: null,
+      email: payload.email,
+      full_name: null,
+      user: createdUser,
+    });
 
     await this.notifyUserSignUpToModerators(createdUser);
+
+    await this.mailsService.sendMail(
+      {
+        template: 'activation',
+        recipient: payload.email,
+        subject: 'Activate your Quadaland account',
+      },
+      {
+        activation_url: new URL(
+          `activate/${activationToken}`,
+          this.applicationConfig.urls.front_site,
+        ),
+        email: payload.email,
+      },
+    );
 
     return {
       success: true,
@@ -109,5 +147,43 @@ export class AuthService {
     return {
       success: true,
     };
+  }
+
+  async activateAccount(activationToken: string) {
+    if (!activationToken)
+      throw new BadRequestException({
+        message: 'invalid.activation_token',
+      });
+
+    const jwtToken = decodeBase64(activationToken);
+
+    try {
+      const decoded = await this.jwtService.verifyAsync(jwtToken, {
+        secret: this.applicationConfig.keys.auth,
+      });
+      await this.verifyActivationToken(decoded.username, activationToken);
+
+      await this.usersService.activate(decoded.username);
+    } catch (err) {
+      if ((err.message = 'jwt malformed'))
+        throw new BadRequestException({
+          message: 'invalid.activation_token',
+        });
+      throw err;
+    }
+
+    return {
+      success: true,
+    };
+  }
+
+  private async verifyActivationToken(username, token) {
+    const user = await this.usersService.findOne(username);
+
+    if (user.activation_token !== token) {
+      throw new ForbiddenException();
+    }
+
+    return user;
   }
 }

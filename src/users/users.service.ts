@@ -166,4 +166,14 @@ export class UsersService {
 
     return user;
   }
+
+  async activate(username) {
+    const user = await this.findOne(username);
+
+    if (!user) return;
+
+    user.activation_token = null;
+    user.is_active = true;
+    await this.usersRepository.save(user);
+  }
 }

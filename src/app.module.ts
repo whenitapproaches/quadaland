@@ -30,6 +30,7 @@ import { StoragesModule } from './storages/storages.module';
 import { PusherModule } from './pusher/pusher.module';
 import pusherConfig from './_config/pusher.config';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
+import mailConfig from './_config/mail.config';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
         swaggerConfig,
         pusherConfig,
         appConfig,
+        mailConfig,
       ],
       isGlobal: true,
     }),

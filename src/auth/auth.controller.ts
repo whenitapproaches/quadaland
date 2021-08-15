@@ -27,6 +27,12 @@ export class AuthController {
     return this.authService.signUp(payload);
   }
 
+  @Post('activate')
+  @HttpCode(200)
+  async activate(@Body() body) {
+    return this.authService.activateAccount(body.activation_token);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('sign-out')
   @HttpCode(200)
