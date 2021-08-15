@@ -55,6 +55,7 @@
     "nest-morgan": "^2.0.0",
     "nest-winston": "^1.4.2",
     "nestjs-form-data": "^1.4.7",
+    "nodemailer": "^6.6.3",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pusher": "^5.0.0",

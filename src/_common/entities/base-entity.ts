@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
 import {
   CreateDateColumn,
   DeleteDateColumn,
@@ -9,7 +8,6 @@ import {
 
 export class BaseEntity {
   @PrimaryGeneratedColumn()
-  @Exclude()
   id: number;
 
   @CreateDateColumn()

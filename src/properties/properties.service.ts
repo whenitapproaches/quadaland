@@ -492,4 +492,10 @@ export class PropertiesService {
 
     return classToPlain(property);
   }
+
+  async findById(id: number) {
+    const property = await this.propertyRepository.findOne(id);
+
+    return classToPlain(property);
+  }
 }
