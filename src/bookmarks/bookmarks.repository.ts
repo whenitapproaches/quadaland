@@ -20,9 +20,14 @@ export class BookmarkRepository extends Repository<BookmarkEntity> {
       });
     }
 
-    query.leftJoinAndSelect('bookmark.user', 'user');
-    query.leftJoinAndSelect('bookmark.property', 'property');
-    query.leftJoinAndSelect('property.details', 'details');
+    query
+      .leftJoinAndSelect('bookmark.user', 'user')
+      .leftJoinAndSelect('bookmark.property', 'property')
+      .leftJoinAndSelect('property.company', 'company')
+      .leftJoinAndSelect('property.details', 'details')
+      .leftJoinAndSelect('details.media', 'media')
+      .leftJoinAndSelect('property.sale_method', 'sale_method')
+      .leftJoinAndSelect('company.user', 'property_user');
 
     if (conditions.byUsername) {
       query.andWhere('user.username = :username', {
