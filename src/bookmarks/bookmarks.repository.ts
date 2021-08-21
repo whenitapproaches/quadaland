@@ -22,7 +22,11 @@ export class BookmarkRepository extends Repository<BookmarkEntity> {
 
     query
       .leftJoinAndSelect('bookmark.user', 'user')
-      .leftJoinAndSelect('bookmark.property', 'property')
+      .innerJoinAndSelect(
+        'bookmark.property',
+        'property',
+        'property.deleted_at IS NULL',
+      )
       .leftJoinAndSelect('property.company', 'company')
       .leftJoinAndSelect('property.details', 'details')
       .leftJoinAndSelect('details.media', 'media')

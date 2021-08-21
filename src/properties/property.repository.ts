@@ -35,6 +35,8 @@ export class PropertyRepository extends Repository<PropertyEntity> {
       .leftJoinAndSelect('property.company', 'company')
       .leftJoinAndSelect('property.sale_method', 'sale_method')
       .leftJoinAndSelect('company.user', 'user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .leftJoinAndSelect('avatar.media', 'media_avatar')
       .leftJoinAndMapOne(
         'property.bookmark',
         BookmarkEntity,
@@ -70,6 +72,8 @@ export class PropertyRepository extends Repository<PropertyEntity> {
       .leftJoinAndSelect('details.media', 'media')
       .leftJoinAndSelect('property.sale_method', 'sale_method')
       .leftJoinAndSelect('company.user', 'user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .leftJoinAndSelect('avatar.media', 'media_avatar')
       .leftJoinAndMapOne(
         'property.bookmark',
         BookmarkEntity,

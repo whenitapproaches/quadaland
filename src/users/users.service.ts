@@ -18,6 +18,7 @@ import { UserRepository } from './user.repository';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RoleEnum } from 'src/roles/role.enum';
 import { CompaniesService } from 'src/companies/companies.service';
+import { AvatarEntity } from 'src/avatars/entities/avatar.entity';
 
 @Injectable()
 export class UsersService {
@@ -40,6 +41,35 @@ export class UsersService {
       },
     );
     return !!existingUser;
+  }
+
+  async hasAvatar(userId: UserEntity['id']) {
+    const user = await this.usersRepository.findOne(userId, {
+      relations: ['avatar'],
+    });
+    console.log(user);
+
+    if (user && user['avatar']) return true;
+    return false;
+  }
+
+  async removeAvatar(userId: UserEntity['id']) {
+    const user = await this.usersRepository.findOne(userId);
+    user.avatar = null;
+    return await this.usersRepository.save(user);
+  }
+
+  async updateAvatar(userId: UserEntity['id'], avatar: AvatarEntity) {
+    const user = await this.usersRepository.findOne(userId);
+    user.avatar = avatar;
+    return await this.usersRepository.save(user);
+  }
+
+  async getAvatar(userId: UserEntity['id']) {
+    const user = await this.usersRepository.findOne(userId, {
+      relations: ['avatar'],
+    });
+    return user ? user['avatar'] : false;
   }
 
   async changePassword(
@@ -91,7 +121,7 @@ export class UsersService {
     const user = await this.usersRepository.findOne(
       { username },
       {
-        relations: ['role'],
+        relations: ['role', 'avatar', 'avatar.media'],
       },
     );
 
@@ -107,7 +137,7 @@ export class UsersService {
     const user = await this.usersRepository.findOne(
       { username },
       {
-        relations: ['role'],
+        relations: ['role', 'avatar', 'avatar.media'],
       },
     );
 
@@ -153,6 +183,10 @@ export class UsersService {
     await this.usersRepository.save(resultUser);
 
     return resultUser;
+  }
+
+  async findById(userId: UserEntity['id']) {
+    return await this.usersRepository.findOne(userId);
   }
 
   async remove(username: UserEntity['username']) {

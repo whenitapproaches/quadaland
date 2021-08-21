@@ -421,6 +421,8 @@ export class PropertiesService {
         relations: [
           'company',
           'company.user',
+          'user.avatar',
+          'avatar.media',
           'details',
           'sale_method',
           'details.media',
@@ -447,6 +449,8 @@ export class PropertiesService {
       relations: [
         'company',
         'company.user',
+        'user.avatar',
+        'avatar.media',
         'details',
         'sale_method',
         'details.media',
@@ -462,6 +466,8 @@ export class PropertiesService {
       relations: [
         'company',
         'company.user',
+        'user.avatar',
+        'avatar.media',
         'details',
         'sale_method',
         'details.media',
@@ -482,6 +488,8 @@ export class PropertiesService {
       relations: [
         'company',
         'company.user',
+        'user.avatar',
+        'avatar.media',
         'details',
         'sale_method',
         'details.media',

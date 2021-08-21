@@ -30,6 +30,7 @@ import { StoragesModule } from './storages/storages.module';
 import { PusherModule } from './pusher/pusher.module';
 import pusherConfig from './_config/pusher.config';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { AvatarsModule } from './avatars/avatars.module';
 import mailConfig from './_config/mail.config';
 
 @Module({
@@ -80,6 +81,7 @@ import mailConfig from './_config/mail.config';
     NotificationsModule,
     StoragesModule,
     PusherModule,
+    AvatarsModule,
   ],
   controllers: [AppController],
   providers: [

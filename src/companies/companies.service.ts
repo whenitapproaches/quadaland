@@ -93,6 +93,8 @@ export class CompaniesService {
     const company = await this.companyRepository
       .createQueryBuilder('company')
       .leftJoinAndSelect('company.user', 'user', 'company.user is not null')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .leftJoinAndSelect('avatar.media', 'avatar_media')
       .andWhere('user.username = :username', { username })
       .getOne();
 
@@ -109,6 +111,8 @@ export class CompaniesService {
       .createQueryBuilder('company')
       .leftJoinAndSelect('company.user', 'user', 'company.user is not null')
       .leftJoinAndSelect('company.media', 'media')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .leftJoinAndSelect('avatar.media', 'avatar_media')
       .andWhere('user.username = :username', { username })
       .getOne();
 

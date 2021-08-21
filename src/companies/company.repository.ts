@@ -1,4 +1,5 @@
 import { classToPlain } from 'class-transformer';
+import { AvatarEntity } from 'src/avatars/entities/avatar.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { QueryCompanyEntityDto } from './dto/query-company';
 import { CompanyEntity } from './entities/company.entity';
@@ -23,7 +24,10 @@ export class CompanyRepository extends Repository<CompanyEntity> {
       });
     }
 
-    query.leftJoinAndSelect('company.user', 'user');
+    query
+      .leftJoinAndSelect('company.user', 'user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .leftJoinAndSelect('avatar.media', 'avatar_media');
 
     query
       .take(queryEntity.per_page)

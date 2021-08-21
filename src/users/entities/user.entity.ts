@@ -5,6 +5,7 @@ import {
   BeforeUpdate,
   JoinColumn,
   ManyToOne,
+  OneToOne,
 } from 'typeorm';
 
 import { Exclude, Transform } from 'class-transformer';
@@ -12,6 +13,7 @@ import { Exclude, Transform } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 import { RoleEntity } from 'src/roles/entities/role.entity';
 import { BaseEntity } from 'src/_common/entities/base-entity';
+import { AvatarEntity } from 'src/avatars/entities/avatar.entity';
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
@@ -33,7 +35,14 @@ export class UserEntity extends BaseEntity {
   @Transform(({ value }) => value.name)
   role: RoleEntity;
 
-  @Column()
+  @OneToOne(() => AvatarEntity)
+  @JoinColumn({ name: 'avatar_id' })
+  avatar: AvatarEntity;
+
+  @Column({
+    nullable: true,
+  })
+  @Exclude()
   activation_token: string;
 
   constructor(data: Partial<UserEntity> = {}) {

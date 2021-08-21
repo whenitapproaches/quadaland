@@ -7,7 +7,6 @@ import { BaseEntity } from './base-entity';
 export class ProfileEntity extends BaseEntity {
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'user_id' })
-  @Transform(({ value }) => value?.username)
   user: UserEntity;
 
   @Column({

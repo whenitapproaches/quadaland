@@ -19,7 +19,10 @@ export class UserRepository extends Repository<UserEntity> {
         search: `${queryEntity.search}%`,
       });
 
-    query.leftJoinAndSelect('user.role', 'role');
+    query
+      .leftJoinAndSelect('user.role', 'role')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .leftJoinAndSelect('avatar.media', 'avatar_media');
 
     if (queryEntity.role)
       query.andWhere('role.name = :role', {

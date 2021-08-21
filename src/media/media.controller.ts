@@ -28,7 +28,6 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import * as path from 'path';
 import { ROOT_PATH } from '_root-path';
 import { QueryMediaEntityDto } from './dto/query-media.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { DeleteMediaDto } from './dto/delete-media.dto';
 
 @Controller('media')
