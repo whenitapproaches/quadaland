@@ -13,7 +13,6 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { DuplicatedException } from 'src/_common/exceptions/duplicated.exception';
 import { JwtService } from '@nestjs/jwt';
 import { JwtManager } from './jwt.manager';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { RoleEnum } from 'src/roles/role.enum';
 import { CustomersService } from 'src/customers/customers.service';
 import { TargetTypes } from 'src/notifications/interfaces/notification-target.interface';
@@ -45,7 +44,12 @@ export class AuthService {
     const user = await this.usersService.findOneOrFail(credential.username);
 
     if (await user.checkPassword(credential.password)) {
-      const payload = { username: user.username, role: user.role.name };
+      const payload = {
+        id: user.id,
+        username: user.username,
+        role: user.role.name,
+      };
+
       return {
         role: user.role.name,
         access_token: this.jwtService.sign(payload),

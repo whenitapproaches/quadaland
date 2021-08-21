@@ -1,5 +1,7 @@
 import { classToPlain } from 'class-transformer';
+import { BookmarkEntity } from 'src/bookmarks/entities/bookmark.entity';
 import { GeolocationService } from 'src/geolocation/geolocation.service';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { Brackets, EntityRepository, Repository } from 'typeorm';
 import { QueryPropertyEntityDto } from './dto/query-property.dto';
 import { PropertyEntity } from './entities/property.entity';
@@ -10,6 +12,7 @@ export class PropertyRepository extends Repository<PropertyEntity> {
   async findByCoordinates(
     queryEntity: QueryPropertyEntityDto,
     geolocationService: GeolocationService,
+    currentUserId: UserEntity['id'],
   ) {
     const query = this.createQueryBuilder('property');
 
@@ -31,7 +34,14 @@ export class PropertyRepository extends Repository<PropertyEntity> {
       .andWhere('details.longitude > :minY', { minY })
       .leftJoinAndSelect('property.company', 'company')
       .leftJoinAndSelect('property.sale_method', 'sale_method')
-      .leftJoinAndSelect('company.user', 'user');
+      .leftJoinAndSelect('company.user', 'user')
+      .leftJoinAndMapOne(
+        'property.bookmark',
+        BookmarkEntity,
+        'bookmark',
+        'bookmark.property_id = property.id and bookmark.user = :currentUserId',
+        { currentUserId },
+      );
 
     const properties = classToPlain(await query.getMany());
 
@@ -48,6 +58,7 @@ export class PropertyRepository extends Repository<PropertyEntity> {
     queryEntity: QueryPropertyEntityDto,
     conditions,
     { withDeleted },
+    currentUserId: UserEntity['id'],
   ) {
     const query = this.createQueryBuilder('property');
 
@@ -58,7 +69,14 @@ export class PropertyRepository extends Repository<PropertyEntity> {
       .leftJoinAndSelect('property.details', 'details')
       .leftJoinAndSelect('details.media', 'media')
       .leftJoinAndSelect('property.sale_method', 'sale_method')
-      .leftJoinAndSelect('company.user', 'user');
+      .leftJoinAndSelect('company.user', 'user')
+      .leftJoinAndMapOne(
+        'property.bookmark',
+        BookmarkEntity,
+        'bookmark',
+        'bookmark.property_id = property.id and bookmark.user_id = :currentUserId',
+        { currentUserId },
+      );
 
     if (queryEntity.search) {
       const searchQuery = `%${queryEntity.search.toLowerCase()}%`;

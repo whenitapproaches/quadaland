@@ -50,20 +50,34 @@ export class PropertiesController {
     @Query() queryPropertyEntityDto: QueryPropertyEntityDto,
     @User('role') currentRole: RoleEnum,
     @User('username') currentUsername: UserEntity['username'],
+    @User('id') currentUserId: UserEntity['id'],
   ) {
     if (queryPropertyEntityDto.coordinates)
-      return this.propertiesService.findByCoordinates(queryPropertyEntityDto);
+      return this.propertiesService.findByCoordinates(
+        queryPropertyEntityDto,
+        currentUsername,
+        currentUserId,
+      );
 
     if ([RoleEnum.Superuser, RoleEnum.Admin].includes(currentRole))
-      return this.propertiesService.findAll(queryPropertyEntityDto);
+      return this.propertiesService.findAll(
+        queryPropertyEntityDto,
+        currentUsername,
+        currentUserId,
+      );
 
     if ([RoleEnum.Company].includes(currentRole))
       return this.propertiesService.findAllByCompany(
         queryPropertyEntityDto,
         currentUsername,
+        currentUserId,
       );
 
-    return this.propertiesService.findAllApproved(queryPropertyEntityDto);
+    return this.propertiesService.findAllApproved(
+      queryPropertyEntityDto,
+      currentUsername,
+      currentUserId,
+    );
   }
 
   @UseGuards(JwtAuthOptionalGuard)

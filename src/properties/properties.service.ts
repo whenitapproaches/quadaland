@@ -151,24 +151,38 @@ export class PropertiesService {
     await this.eventEmitter.emit('property.created', propertyCreatedEvent);
   }
 
-  findByCoordinates(queryPropertyEntityDto: QueryPropertyEntityDto) {
+  findByCoordinates(
+    queryPropertyEntityDto: QueryPropertyEntityDto,
+    currentUsername,
+    currentUserId: UserEntity['id'],
+  ) {
     return this.propertyRepository.findByCoordinates(
       queryPropertyEntityDto,
       this.geolocationService,
+      currentUserId,
     );
   }
 
-  findAll(queryPropertyEntityDto: QueryPropertyEntityDto) {
+  findAll(
+    queryPropertyEntityDto: QueryPropertyEntityDto,
+    currentUsername,
+    currentUserId: UserEntity['id'],
+  ) {
     return this.propertyRepository.findByQueriesWithCondition(
       queryPropertyEntityDto,
       {},
       {
         withDeleted: true,
       },
+      currentUserId,
     );
   }
 
-  findAllApproved(queryPropertyEntityDto: QueryPropertyEntityDto) {
+  findAllApproved(
+    queryPropertyEntityDto: QueryPropertyEntityDto,
+    currentUsername,
+    currentUserId: UserEntity['id'],
+  ) {
     return this.propertyRepository.findByQueriesWithCondition(
       queryPropertyEntityDto,
       {
@@ -177,12 +191,14 @@ export class PropertiesService {
       {
         withDeleted: false,
       },
+      currentUserId,
     );
   }
 
   findAllByCompany(
     queryPropertyEntityDto: QueryPropertyEntityDto,
     currentUsername,
+    currentUserId,
   ) {
     return this.propertyRepository.findByQueriesWithCondition(
       queryPropertyEntityDto,
@@ -193,6 +209,7 @@ export class PropertiesService {
       {
         withDeleted: false,
       },
+      currentUsername,
     );
   }
 
