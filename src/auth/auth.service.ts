@@ -42,7 +42,6 @@ export class AuthService {
 
   async signIn(credential: SignInDto) {
     const user = await this.usersService.findOneOrFail(credential.username);
-
     if (await user.checkPassword(credential.password)) {
       const payload = {
         id: user.id,

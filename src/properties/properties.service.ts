@@ -44,6 +44,19 @@ export class PropertiesService {
     });
   }
 
+  // async summary() {
+  //   const totalAllTime = await this.propertyRepository.count({
+  //     withDeleted: true,
+  //   });
+
+  //   const totalToday = await this.propertyRepository.count({
+  //     where: {
+  //       created_at:
+  //     },
+  //     withDeleted: true,
+  //   })
+  // }
+
   async existBySlug(slug) {
     const property = await this.propertyRepository.findOne(
       {

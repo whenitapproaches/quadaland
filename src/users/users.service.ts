@@ -206,8 +206,11 @@ export class UsersService {
 
     if (!user) return;
 
-    user.activation_token = null;
-    user.is_active = true;
-    await this.usersRepository.save(user);
+    const resultUser = await this.usersRepository.merge(user, {
+      activation_token: null,
+      is_active: true,
+    });
+
+    await this.usersRepository.save(resultUser);
   }
 }

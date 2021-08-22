@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToOne,
+  AfterLoad,
 } from 'typeorm';
 
 import { Exclude, Transform } from 'class-transformer';
@@ -50,12 +51,21 @@ export class UserEntity extends BaseEntity {
     Object.assign(this, data);
   }
 
+  #tempPassword;
+
+  @AfterLoad()
+  private loadTempPassword(): void {
+    this.#tempPassword = this.password;
+  }
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {
-    if (!/^\$2a\$\d+\$/.test(this.password)) {
-      const saltRounds = 5;
-      this.password = await bcrypt.hash(this.password, saltRounds);
+    if (this.#tempPassword !== this.password) {
+      if (!/^\$2a\$\d+\$/.test(this.password)) {
+        const saltRounds = 5;
+        this.password = await bcrypt.hash(this.password, saltRounds);
+      }
     }
   }
 

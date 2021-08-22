@@ -31,6 +31,7 @@ import { PusherModule } from './pusher/pusher.module';
 import pusherConfig from './_config/pusher.config';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { AvatarsModule } from './avatars/avatars.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import mailConfig from './_config/mail.config';
 
 @Module({
@@ -82,6 +83,7 @@ import mailConfig from './_config/mail.config';
     StoragesModule,
     PusherModule,
     AvatarsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [
