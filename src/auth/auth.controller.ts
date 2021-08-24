@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -31,6 +32,24 @@ export class AuthController {
   @HttpCode(200)
   async activate(@Body() body) {
     return this.authService.activateAccount(body.activation_token);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(200)
+  async forgot(@Body() payload: ForgotPasswordDto) {
+    return this.authService.forgotPassword(payload);
+  }
+
+  @Post('verify-forgot-password')
+  @HttpCode(200)
+  async verifyForgotPassword(@Body() body) {
+    return this.authService.resetAccount(body.forgot_password_token);
+  }
+
+  @Post('reset-password')
+  @HttpCode(200)
+  async resetPassword(@Body() payload: SignInDto) {
+    return this.authService.resetPassword(payload);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -30,6 +30,16 @@ export class CustomersService {
     return this.customerRepository.save(customer);
   }
 
+  async findByEmail(email: CustomerEntity['email']): Promise<CustomerEntity> {
+    const customer = await this.customerRepository
+      .createQueryBuilder('customer')
+      .withDeleted()
+      .leftJoinAndSelect('customer.user', 'user', 'customer.user is not null')
+      .where('customer.email = :email', { email })
+      .getOne();
+    return customer;
+  }
+
   async findByUsername(
     username: UserEntity['username'],
   ): Promise<CustomerEntity> {

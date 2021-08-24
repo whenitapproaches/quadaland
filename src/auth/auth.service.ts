@@ -1,8 +1,11 @@
 import {
   BadRequestException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
@@ -26,6 +29,7 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import { decodeBase64, encodeBase64 } from 'src/_common/utils/base64.util';
 import { URL } from 'url';
 import appConfig from 'src/_config/app.config';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -116,6 +120,45 @@ export class AuthService {
     };
   }
 
+  async forgotPassword(payload: ForgotPasswordDto) {
+    const existedCustomer = await this.customersService.findByEmail(
+      payload.email,
+    );
+    if (!existedCustomer) throw new NotFoundException();
+    if (!existedCustomer.user.is_active)
+      throw new HttpException(
+        { message: 'Email is not active' },
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    const activationToken = this.generateActivationToken(
+      existedCustomer.user.username,
+    );
+
+    await this.usersService.updateToken(existedCustomer.user, activationToken);
+
+    await this.mailsService.sendMail(
+      {
+        template: 'activation',
+        recipient: payload.email,
+        subject: 'Reset your Quadaland account',
+      },
+      {
+        activation_url: new URL(
+          `reset-password/${activationToken}`,
+          this.applicationConfig.urls.front_site,
+        ),
+        email: payload.email,
+      },
+    );
+
+    return {
+      success: true,
+      data: {
+        username: existedCustomer.user.username,
+      },
+    };
+  }
+
   private async notifyUserSignUpToModerators(user) {
     const userSignedUpEvent = new UserSignedUpEvent();
 
@@ -144,6 +187,42 @@ export class AuthService {
     );
     jwtManager.revoke(token);
 
+    return {
+      success: true,
+    };
+  }
+
+  async resetAccount(resetToken: string) {
+    if (!resetToken)
+      throw new BadRequestException({
+        message: 'invalid.activation_token',
+      });
+
+    const jwtToken = decodeBase64(resetToken);
+    let name;
+    try {
+      const decoded = await this.jwtService.verifyAsync(jwtToken, {
+        secret: this.applicationConfig.keys.auth,
+      });
+      await this.verifyActivationToken(decoded.username, resetToken);
+      name = decoded.username;
+      await this.usersService.activate(decoded.username);
+    } catch (err) {
+      if ((err.message = 'jwt malformed'))
+        throw new BadRequestException({
+          message: 'invalid.forgot_password_token',
+        });
+      throw err;
+    }
+
+    return {
+      username: name,
+      success: true,
+    };
+  }
+
+  async resetPassword(payload: SignInDto) {
+    await this.usersService.resetPassword(payload);
     return {
       success: true,
     };
