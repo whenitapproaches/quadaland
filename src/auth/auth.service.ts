@@ -138,13 +138,13 @@ export class AuthService {
 
     await this.mailsService.sendMail(
       {
-        template: 'activation',
+        template: 'resetpassword',
         recipient: payload.email,
         subject: 'Reset your Quadaland account',
       },
       {
-        activation_url: new URL(
-          `reset-password/${activationToken}`,
+        reset_token_url: new URL(
+          `verify-forgot-password/${activationToken}`,
           this.applicationConfig.urls.front_site,
         ),
         email: payload.email,
