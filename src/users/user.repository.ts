@@ -22,7 +22,7 @@ export class UserRepository extends Repository<UserEntity> {
     query
       .leftJoinAndSelect('user.role', 'role')
       .leftJoinAndSelect('user.avatar', 'avatar')
-      .leftJoinAndSelect('avatar.media', 'avatar_media');
+      .leftJoinAndSelect('avatar.media', 'media_avatar');
 
     if (queryEntity.role)
       query.andWhere('role.name = :role', {

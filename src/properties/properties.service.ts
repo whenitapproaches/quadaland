@@ -25,6 +25,8 @@ import { NotificationTypeEnum } from 'src/notifications/notification-type.enum';
 import { TargetTypes } from 'src/notifications/interfaces/notification-target.interface';
 import { PropertyApprovedEvent } from './events/property-approved';
 import { NotificationVisibilityEnum } from 'src/notifications/notification-visibility.enum';
+import { MoreThanOrEqual } from 'typeorm';
+import { getStartCurrentDate } from 'src/_common/utils/dates.utils';
 
 @Injectable()
 export class PropertiesService {
@@ -44,18 +46,31 @@ export class PropertiesService {
     });
   }
 
-  // async summary() {
-  //   const totalAllTime = await this.propertyRepository.count({
-  //     withDeleted: true,
-  //   });
+  async summary() {
+    const totalAllTime = await this.propertyRepository.count({
+      withDeleted: true,
+    });
 
-  //   const totalToday = await this.propertyRepository.count({
-  //     where: {
-  //       created_at:
-  //     },
-  //     withDeleted: true,
-  //   })
-  // }
+    const totalApprovedAllTime = await this.propertyRepository.count({
+      where: {
+        approval_status: true,
+      },
+      withDeleted: true,
+    });
+
+    const totalToday = await this.propertyRepository.count({
+      where: {
+        created_at: MoreThanOrEqual(getStartCurrentDate()),
+      },
+      withDeleted: true,
+    });
+
+    return {
+      totalAllTime,
+      totalApprovedAllTime,
+      totalToday,
+    };
+  }
 
   async existBySlug(slug) {
     const property = await this.propertyRepository.findOne(
