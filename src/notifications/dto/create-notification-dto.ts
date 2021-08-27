@@ -21,10 +21,10 @@ export class createNotificationDto {
   object: string;
 
   @IsEnum(NotificationVisibilityEnum)
-  visibility: NotificationVisibilityEnum.Private;
+  visibility: NotificationVisibilityEnum = NotificationVisibilityEnum.Private;
 
   @IsEnum(NotificationSeverityEnum)
-  severity: NotificationSeverityEnum.Info;
+  severity: NotificationSeverityEnum = NotificationSeverityEnum.Info;
 
   @Exclude({ toPlainOnly: true })
   target: NotificationTargetInterface;

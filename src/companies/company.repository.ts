@@ -14,6 +14,15 @@ export class CompanyRepository extends Repository<CompanyEntity> {
 
     if (withDeleted) query.withDeleted();
 
+    if (queryEntity.sort_by) {
+      queryEntity.sort_by.forEach((sortField) => {
+        const order = sortField.includes('-') ? 'DESC' : 'ASC';
+        const field = sortField.replace(/[+-]/, '');
+        const relationField = `company.${field}`;
+        query.addOrderBy(relationField, order);
+      });
+    }
+
     query.leftJoinAndSelect('company.user', 'user');
 
     query

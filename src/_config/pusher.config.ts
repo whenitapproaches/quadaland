@@ -12,9 +12,9 @@ const {
 } = process.env;
 
 export default registerAs('pusher', () => ({
-  appId: PUSHER_APP_KEY,
-  key: PUSHER_APP_SECRET,
-  secret: PUSHER_APP_ID,
+  appId: PUSHER_APP_ID,
+  key: PUSHER_APP_KEY,
+  secret: PUSHER_APP_SECRET,
   cluster: PUSHER_CLUSTER,
-  useTLS: true,
+  useTLS: false,
 }));

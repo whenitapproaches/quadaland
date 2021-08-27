@@ -51,7 +51,9 @@ export class PropertyDetailEntity extends BaseEntity {
   @Column()
   title: string;
 
-  @Column()
+  @Column({
+    length: 5000,
+  })
   description: string;
 
   @ManyToMany(() => MediaEntity)

@@ -33,6 +33,9 @@ export class UserEntity extends BaseEntity {
   @Transform(({ value }) => value.name)
   role: RoleEntity;
 
+  @Column()
+  activation_token: string;
+
   constructor(data: Partial<UserEntity> = {}) {
     super();
     Object.assign(this, data);

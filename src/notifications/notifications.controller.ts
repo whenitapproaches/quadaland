@@ -13,6 +13,7 @@ export class NotificationsController {
   @Get()
   findMany(
     @User('username') currentUsername: UserEntity['username'],
+    @User('role') currentRole: UserEntity['role'],
     @Query() queryEntityDto: QueryNotificationEntityDto,
   ) {
     return this.notificationsService.findMany(queryEntityDto, currentUsername);

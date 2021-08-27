@@ -29,6 +29,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { StoragesModule } from './storages/storages.module';
 import { PusherModule } from './pusher/pusher.module';
 import pusherConfig from './_config/pusher.config';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
+import mailConfig from './_config/mail.config';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import pusherConfig from './_config/pusher.config';
         swaggerConfig,
         pusherConfig,
         appConfig,
+        mailConfig,
       ],
       isGlobal: true,
     }),
@@ -72,6 +75,7 @@ import pusherConfig from './_config/pusher.config';
     MediaModule,
     PropertySaleMethodsModule,
     PropertyDetailsModule,
+    BookmarksModule,
     GeolocationModule,
     NotificationsModule,
     StoragesModule,

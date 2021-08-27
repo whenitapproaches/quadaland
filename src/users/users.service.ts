@@ -18,6 +18,7 @@ import { UserRepository } from './user.repository';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RoleEnum } from 'src/roles/role.enum';
 import { CompaniesService } from 'src/companies/companies.service';
+import {SignInDto} from "../auth/dto/sign-in.dto";
 
 @Injectable()
 export class UsersService {
@@ -61,6 +62,13 @@ export class UsersService {
 
     await this.usersRepository.save(user);
 
+    return user;
+  }
+
+  async resetPassword(newAccountInfo: SignInDto) {
+    const user = await this.findOneOrFail(newAccountInfo.username);
+    user.password = newAccountInfo.password;
+    await this.usersRepository.save(user);
     return user;
   }
 
@@ -126,6 +134,13 @@ export class UsersService {
     };
   }
 
+  async updateToken(userData: UserEntity, token: string) {
+    const user = await this.findOneOrFail(userData.username);
+    user.activation_token = token;
+    await this.usersRepository.save(user);
+    return user;
+  }
+
   async update(
     username: UserEntity['username'],
     currentUsername: UserEntity['username'],
@@ -165,5 +180,15 @@ export class UsersService {
     await this.usersRepository.softDelete({ username });
 
     return user;
+  }
+
+  async activate(username) {
+    const user = await this.findOne(username);
+
+    if (!user) return;
+
+    user.activation_token = null;
+    user.is_active = true;
+    await this.usersRepository.save(user);
   }
 }

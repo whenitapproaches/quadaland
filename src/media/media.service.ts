@@ -18,9 +18,15 @@ import { MediaTypeEnum } from './media-type.enum';
 import { MediaVisibilityEnum } from './media-visibility.enum';
 import { MediaRepository } from './media.repository';
 import * as path from 'path';
+import * as fs from 'fs';
+import * as util from 'util';
 import { ROOT_PATH } from '_root-path';
 import { QueryMediaEntityDto } from './dto/query-media.dto';
 import { DeleteMediaDto } from './dto/delete-media.dto';
+
+function fileExistsAsync() {
+  return util.promisify(fs.exists);
+}
 
 @Injectable()
 export class MediaService {
@@ -207,7 +213,8 @@ export class MediaService {
       }
     }
 
-    return response.sendFile(path.resolve(ROOT_PATH, media.path));
+    const imagePath = path.resolve(ROOT_PATH, media.path);
+    if (await fileExistsAsync()(imagePath)) return response.sendFile(imagePath);
   }
 
   async remove(

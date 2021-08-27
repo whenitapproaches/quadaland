@@ -23,6 +23,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PropertyCreatedEvent } from './events/property-created.event';
 import { NotificationTypeEnum } from 'src/notifications/notification-type.enum';
 import { TargetTypes } from 'src/notifications/interfaces/notification-target.interface';
+import { PropertyApprovedEvent } from './events/property-approved';
+import { NotificationVisibilityEnum } from 'src/notifications/notification-visibility.enum';
 
 @Injectable()
 export class PropertiesService {
@@ -93,26 +95,17 @@ export class PropertiesService {
     return property;
   }
 
-  private emitPropertyCreatedEvent(payload: PropertyCreatedEvent) {
-    return this.eventEmitter.emit('property.created', payload);
-  }
-
-  async createByAdmin(createPropertyDto: CreatePropertyDto) {
+  async createByAdmin(
+    createPropertyDto: CreatePropertyDto,
+    currentUsername: UserEntity['username'],
+  ) {
     const property = await this.create(createPropertyDto);
 
     property.approval_status = true;
 
     const savedProperty = await this.propertyRepository.save(property);
 
-    const propertyCreatedEvent = new PropertyCreatedEvent();
-
-    propertyCreatedEvent.notification.type =
-      NotificationTypeEnum.AdminPostingProperty;
-
-    propertyCreatedEvent.notification.target.id = savedProperty.slug;
-    propertyCreatedEvent.notification.target.type = TargetTypes.Property;
-
-    await this.emitPropertyCreatedEvent(propertyCreatedEvent);
+    await this.notifyAdminPostingPropertyToCustomers(property, currentUsername);
 
     return savedProperty;
   }
@@ -132,19 +125,30 @@ export class PropertiesService {
 
     const savedProperty = await this.propertyRepository.save(property);
 
+    await this.notifyCompanyPostingPropertyToModerators(property);
+
+    return savedProperty;
+  }
+
+  private async notifyCompanyPostingPropertyToModerators(property) {
     const propertyCreatedEvent = new PropertyCreatedEvent();
 
     propertyCreatedEvent.notification.type =
-      NotificationTypeEnum.AdminPostingProperty;
+      NotificationTypeEnum.CompanyPostingProperty;
 
-    propertyCreatedEvent.notification.object = savedProperty.company.full_name;
+    propertyCreatedEvent.notification.visibility =
+      NotificationVisibilityEnum.Group;
 
-    propertyCreatedEvent.notification.target.id = savedProperty.slug;
-    propertyCreatedEvent.notification.target.type = TargetTypes.Property;
+    propertyCreatedEvent.notification.object = property.company.full_name;
 
-    await this.emitPropertyCreatedEvent(propertyCreatedEvent);
+    propertyCreatedEvent.notification.target = {
+      id: property.slug,
+      type: TargetTypes.Property,
+    };
 
-    return savedProperty;
+    propertyCreatedEvent.channelName = 'private-moderators';
+
+    await this.eventEmitter.emit('property.created', propertyCreatedEvent);
   }
 
   findByCoordinates(queryPropertyEntityDto: QueryPropertyEntityDto) {
@@ -211,6 +215,8 @@ export class PropertiesService {
       withDeleted: true,
     });
 
+    const old_approval_status = property.approval_status;
+
     if (!property)
       throw new NotFoundException({
         message: 'not_found.read.property',
@@ -271,11 +277,77 @@ export class PropertiesService {
 
     const savedProperty = await this.propertyRepository.save(updatedProperty);
 
-    if (savedProperty.approval_status !== updatePropertyDto.approval_status) {
-      this.eventEmitter.emit('');
+    if (
+      savedProperty.approval_status !== old_approval_status &&
+      savedProperty.approval_status &&
+      !savedProperty.deleted_at
+    ) {
+      await this.notifyPropertyApprovedToCompany(property, currentUsername);
+      await this.notifyPropertyApprovedToCustomers(property, currentUsername);
     }
 
     return savedProperty;
+  }
+
+  private async notifyPropertyApprovedToCustomers(property, currentUsername) {
+    const propertyApproved = new PropertyApprovedEvent();
+
+    propertyApproved.notification.type =
+      NotificationTypeEnum.CompanyPostingProperty;
+
+    propertyApproved.notification.subject = currentUsername;
+
+    propertyApproved.channelName = `private-customers`;
+
+    propertyApproved.notification.target = {
+      id: property.slug,
+      type: TargetTypes.Property,
+    };
+
+    await this.eventEmitter.emit('property.approved', propertyApproved);
+  }
+
+  private async notifyAdminPostingPropertyToCustomers(
+    property,
+    currentUsername,
+  ) {
+    const propertyApproved = new PropertyApprovedEvent();
+
+    propertyApproved.notification.type =
+      NotificationTypeEnum.AdminApprovingProperty;
+
+    propertyApproved.notification.object = property.company.user.username;
+
+    propertyApproved.notification.subject = currentUsername;
+
+    propertyApproved.channelName = `private-customers`;
+
+    propertyApproved.notification.target = {
+      id: property.slug,
+      type: TargetTypes.Property,
+    };
+
+    await this.eventEmitter.emit('property.approved', propertyApproved);
+  }
+
+  private async notifyPropertyApprovedToCompany(property, currentUsername) {
+    const propertyApproved = new PropertyApprovedEvent();
+
+    propertyApproved.notification.type =
+      NotificationTypeEnum.AdminApprovingProperty;
+
+    propertyApproved.notification.object = property.company.user.username;
+
+    propertyApproved.notification.subject = currentUsername;
+
+    propertyApproved.channelName = `private-user-${property.company.user.username}`;
+
+    propertyApproved.notification.target = {
+      id: property.slug,
+      type: TargetTypes.Property,
+    };
+
+    await this.eventEmitter.emit('property.approved', propertyApproved);
   }
 
   async remove(
@@ -417,6 +489,12 @@ export class PropertiesService {
       throw new ForbiddenException({
         message: 'not_allowed.read.other_company_property',
       });
+
+    return classToPlain(property);
+  }
+
+  async findById(id: number) {
+    const property = await this.propertyRepository.findOne(id);
 
     return classToPlain(property);
   }

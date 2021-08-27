@@ -31,6 +31,15 @@ export class UserRepository extends Repository<UserEntity> {
         is_active: queryEntity.is_active,
       });
 
+    if (queryEntity.sort_by) {
+      queryEntity.sort_by.forEach((sortField) => {
+        const order = sortField.includes('-') ? 'DESC' : 'ASC';
+        const field = sortField.replace(/[+-]/, '');
+        const relationField = `user.${field}`;
+        query.addOrderBy(relationField, order);
+      });
+    }
+
     query
       .take(queryEntity.per_page)
       .skip(queryEntity.per_page * (queryEntity.page - 1));

@@ -38,7 +38,10 @@ export class PropertiesController {
         currentUsername,
       );
 
-    return this.propertiesService.createByAdmin(createPropertyDto);
+    return this.propertiesService.createByAdmin(
+      createPropertyDto,
+      currentUsername,
+    );
   }
 
   @UseGuards(JwtAuthOptionalGuard)

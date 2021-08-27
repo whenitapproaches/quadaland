@@ -8,6 +8,9 @@ import { PropertyDetailsModule } from 'src/property-details/property-details.mod
 import { CompaniesModule } from 'src/companies/companies.module';
 import { GeolocationModule } from 'src/geolocation/geolocation.module';
 import { PropertyListener } from './listeners/property.listener';
+import { PusherService } from 'src/pusher/pusher.service';
+import { PusherModule } from 'src/pusher/pusher.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -16,6 +19,8 @@ import { PropertyListener } from './listeners/property.listener';
     CompaniesModule,
     GeolocationModule,
     TypeOrmModule.forFeature([PropertyRepository]),
+    PusherModule,
+    NotificationsModule,
   ],
   controllers: [PropertiesController],
   providers: [PropertiesService, PropertyListener],
