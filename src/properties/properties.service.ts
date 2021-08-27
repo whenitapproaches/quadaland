@@ -449,8 +449,8 @@ export class PropertiesService {
         relations: [
           'company',
           'company.user',
-          'user.avatar',
-          'avatar.media',
+          'company.user.avatar',
+          'company.user.avatar.media',
           'details',
           'sale_method',
           'details.media',
@@ -477,13 +477,18 @@ export class PropertiesService {
       relations: [
         'company',
         'company.user',
-        'user.avatar',
-        'avatar.media',
+        'company.user.avatar',
+        'company.user.avatar.media',
         'details',
         'sale_method',
         'details.media',
       ],
     });
+
+    if (!property)
+      throw new NotFoundException({
+        message: 'not_found.read.property',
+      });
 
     return classToPlain(property);
   }
@@ -494,8 +499,8 @@ export class PropertiesService {
       relations: [
         'company',
         'company.user',
-        'user.avatar',
-        'avatar.media',
+        'company.user.avatar',
+        'company.user.avatar.media',
         'details',
         'sale_method',
         'details.media',
@@ -516,8 +521,8 @@ export class PropertiesService {
       relations: [
         'company',
         'company.user',
-        'user.avatar',
-        'avatar.media',
+        'company.user.avatar',
+        'company.user.avatar.media',
         'details',
         'sale_method',
         'details.media',
