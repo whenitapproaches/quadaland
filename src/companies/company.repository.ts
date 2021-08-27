@@ -27,7 +27,7 @@ export class CompanyRepository extends Repository<CompanyEntity> {
     query
       .leftJoinAndSelect('company.user', 'user')
       .leftJoinAndSelect('user.avatar', 'avatar')
-      .leftJoinAndSelect('avatar.media', 'avatar_media');
+      .leftJoinAndSelect('avatar.media', 'media_avatar');
 
     query
       .take(queryEntity.per_page)

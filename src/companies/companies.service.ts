@@ -94,7 +94,7 @@ export class CompaniesService {
       .createQueryBuilder('company')
       .leftJoinAndSelect('company.user', 'user', 'company.user is not null')
       .leftJoinAndSelect('user.avatar', 'avatar')
-      .leftJoinAndSelect('avatar.media', 'avatar_media')
+      .leftJoinAndSelect('avatar.media', 'media_avatar')
       .andWhere('user.username = :username', { username })
       .getOne();
 
@@ -112,7 +112,7 @@ export class CompaniesService {
       .leftJoinAndSelect('company.user', 'user', 'company.user is not null')
       .leftJoinAndSelect('company.media', 'media')
       .leftJoinAndSelect('user.avatar', 'avatar')
-      .leftJoinAndSelect('avatar.media', 'avatar_media')
+      .leftJoinAndSelect('avatar.media', 'media_avatar')
       .andWhere('user.username = :username', { username })
       .getOne();
 
